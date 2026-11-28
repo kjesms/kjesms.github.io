@@ -4807,7 +4807,7 @@ function draw2d(){
    if(f.rx||f.rz){x2.fillStyle=f.color;x2.fillRect(-w/2,-d/2,w,d)}else drawTop(x2,f,w,d,px);x2.globalAlpha=1}
   if(up){x2.setLineDash([5*px,4*px]);x2.lineWidth=1.2*px;x2.strokeStyle='#475569';x2.strokeRect(-w/2,-d/2,w,d);x2.setLineDash([])}
   if(isSel){x2.lineWidth=2.5*px;x2.strokeStyle='#f97316';x2.strokeRect(-w/2-2*px,-d/2-2*px,w+4*px,d+4*px);x2.fillStyle='#f97316';const tr=Math.min(9*px,Math.min(w,d)/3);x2.beginPath();x2.moveTo(-tr,d/2+3*px);x2.lineTo(tr,d/2+3*px);x2.lineTo(0,d/2+3*px+tr);x2.closePath();x2.fill();
-   if(!isLocked(f)&&!f.rx&&!f.rz){const hr=7*px;[[-1,-1],[1,-1],[1,1],[-1,1]].forEach(q=>{x2.beginPath();x2.arc(q[0]*(w/2+2*px),q[1]*(d/2+2*px),hr,0,7);x2.fillStyle='#fff';x2.fill();x2.lineWidth=2.5*px;x2.strokeStyle='#f97316';x2.stroke()})}
+   if(f.auto!=='door'&&!f.rx&&!f.rz){const hr=(window.__coarse?10:7.5)*px;[[-1,-1],[1,-1],[1,1],[-1,1],[0,-1],[1,0],[0,1],[-1,0]].forEach(q=>{if((q[0]===0&&w/px<44)||(q[1]===0&&d/px<44))return;const X=q[0]*(w/2+2*px),Y=q[1]*(d/2+2*px);x2.beginPath();if(q[0]&&q[1])x2.arc(X,Y,hr,0,7);else{const a=hr*.8;x2.rect(X-a,Y-a,2*a,2*a)}x2.fillStyle='#fff';x2.fill();x2.lineWidth=2.5*px;x2.strokeStyle='#f97316';x2.stroke()})}
    if(rsz&&rsz.id===f.id){x2.save();x2.rotate(-f.rot*Math.PI/180);x2.font='600 '+(13*px)+'px sans-serif';const tx=Math.round(f.w)+' × '+Math.round(f.d)+' cm',tw=x2.measureText(tx).width+12*px;x2.fillStyle='rgba(15,23,42,.85)';x2.fillRect(-tw/2,-Math.max(w,d)/2-34*px,tw,20*px);x2.fillStyle='#fff';x2.textAlign='center';x2.textBaseline='middle';x2.fillText(tx,0,-Math.max(w,d)/2-24*px);x2.restore()}}
   x2.restore()});
  try{drawPro()}catch(e){}
@@ -5528,7 +5528,7 @@ function renderChips(){const el=$('rchips');if(!el)return;const main=ROOMS.filte
  el.style.display=S.mode==='walk'?'none':'flex';const on=el.querySelector('.on');if(on&&on.scrollIntoView)try{on.scrollIntoView({block:'nearest',inline:'center'})}catch(e){}}
 /* ===== 2D 입력: 고른 가구만 끌어서 이동, 나머지는 화면 이동 ===== */
 let lastTap=null,rsz=null;
-function hitHandle(wx,wy){const f=selF();if(!f||isLocked(f)||f.rx||f.rz)return null;const th=f.rot*Math.PI/180,dx=wx-f.x,dy=wy-f.y,lx=dx*Math.cos(th)+dy*Math.sin(th),ly=-dx*Math.sin(th)+dy*Math.cos(th),w=f.w*PXCM,d=f.d*PXCM,tol=18/V.s;let best=null,bd=1e9;[[-1,-1],[1,-1],[1,1],[-1,1]].forEach(q=>{const dd=Math.hypot(lx-q[0]*w/2,ly-q[1]*d/2);if(dd<tol&&dd<bd){bd=dd;best=q}});if(!best)return null;
+function hitHandle(wx,wy){const f=selF();if(!f||f.auto==='door'||f.rx||f.rz)return null;const th=f.rot*Math.PI/180,dx=wx-f.x,dy=wy-f.y,lx=dx*Math.cos(th)+dy*Math.sin(th),ly=-dx*Math.sin(th)+dy*Math.cos(th),w=f.w*PXCM,d=f.d*PXCM,tol=(window.__coarse?28:16)/V.s;let best=null,bd=1e9;[[-1,-1],[1,-1],[1,1],[-1,1],[0,-1],[1,0],[0,1],[-1,0]].forEach(q=>{if((q[0]===0&&w*V.s<44)||(q[1]===0&&d*V.s<44))return;const dd=Math.hypot(lx-q[0]*(w/2),ly-q[1]*(d/2))*(q[0]&&q[1]?.85:1);if(dd<tol&&dd<bd){bd=dd;best=q}});if(!best)return null;
  const ax=-best[0]*w/2,ay=-best[1]*d/2;return{id:f.id,q:best,ax:f.x+ax*Math.cos(th)-ay*Math.sin(th),ay:f.y+ax*Math.sin(th)+ay*Math.cos(th),th,w0:f.w,d0:f.d,x0:f.x,y0:f.y}}
 function canDrag(f){return f&&!isLocked(f)&&(f.id===S.sel||S.opt.dragAny)}
 c2.addEventListener('pointerdown',e=>{c2.setPointerCapture(e.pointerId);const p=lp(e);P.set(e.pointerId,p);stopAnim();
@@ -5538,7 +5538,7 @@ c2.addEventListener('pointerdown',e=>{c2.setPointerCapture(e.pointerId);const p=
  else if(P.size===2){if(rsz){const f=getF(rsz.id);if(f){f.w=rsz.w0;f.d=rsz.d0;f.x=rsz.x0;f.y=rsz.y0;dirty3=true}rsz=null}drag=null;tapInfo=null;clearTimeout(lpT);const[a,b]=[...P.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,mx:(a.x+b.x)/2,my:(a.y+b.y)/2,s:V.s,tx:V.tx,ty:V.ty}}});
 c2.addEventListener('pointermove',e=>{if(!P.has(e.pointerId))return;const p=lp(e),o=P.get(e.pointerId);P.set(e.pointerId,p);
  if(P.size===2&&pinch){const[a,b]=[...P.values()];const d=Math.hypot(a.x-b.x,a.y-b.y),mx=(a.x+b.x)/2,my=(a.y+b.y)/2;const s=clamp(pinch.s*d/pinch.d,.3,10);const wx=(pinch.mx-pinch.tx)/pinch.s,wy=(pinch.my-pinch.ty)/pinch.s;V.s=s;V.tx=mx-wx*s;V.ty=my-wy*s;need2d=true;return}
- if(P.size!==1)return;if(rsz){const f=getF(rsz.id);if(!f)return;const[wx,wy]=s2w(p.x,p.y),dx=wx-rsz.ax,dy=wy-rsz.ay,c=Math.cos(rsz.th),sn=Math.sin(rsz.th);let lx=(dx*c+dy*sn)*rsz.q[0]/PXCM,ly=(-dx*sn+dy*c)*rsz.q[1]/PXCM;const g=S.opt.snap?5:1;lx=Math.max(10,Math.round(lx/g)*g);ly=Math.max(5,Math.round(ly/g)*g);f.w=lx;f.d=ly;const hx=rsz.q[0]*lx*PXCM/2,hy=rsz.q[1]*ly*PXCM/2;f.x=rsz.ax+hx*c-hy*sn;f.y=rsz.ay+hx*sn+hy*c;need2d=true;dirty3=true;return}
+ if(P.size!==1)return;if(rsz){const f=getF(rsz.id);if(!f)return;const[wx,wy]=s2w(p.x,p.y),dx=wx-rsz.ax,dy=wy-rsz.ay,c=Math.cos(rsz.th),sn=Math.sin(rsz.th);let lx=rsz.q[0]?(dx*c+dy*sn)*rsz.q[0]/PXCM:rsz.w0,ly=rsz.q[1]?(-dx*sn+dy*c)*rsz.q[1]/PXCM:rsz.d0;const g=S.opt.snap?5:1;if(rsz.q[0])lx=Math.max(10,Math.round(lx/g)*g);if(rsz.q[1])ly=Math.max(5,Math.round(ly/g)*g);f.w=lx;f.d=ly;const hx=rsz.q[0]*lx*PXCM/2,hy=rsz.q[1]*ly*PXCM/2;f.x=rsz.ax+hx*c-hy*sn;f.y=rsz.ay+hx*sn+hy*c;need2d=true;dirty3=true;return}
  if(tapInfo)tapInfo.m+=Math.abs(p.x-o.x)+Math.abs(p.y-o.y);
  if(drag){if(tapInfo&&tapInfo.m<8)return;clearTimeout(lpT);const f=getF(drag.id);if(!f)return;const[wx,wy]=s2w(p.x,p.y);if(S.rotMode){f.rot=((f.rot+(p.x-o.x)*.9)%360+360)%360;need2d=true;dirty3=true;return}let nx=wx+drag.ox,ny=wy+drag.oy;if(S.opt.snap){const g=5*PXCM;nx=Math.round(nx/g)*g;ny=Math.round(ny/g)*g}
   if(tryMove(f,nx,ny)){need2d=true;dirty3=true}}
@@ -5960,5 +5960,8 @@ function fitWalls19(){if(VER.ann.rev<19)return 0;let c=0;const box=(f,x,y)=>{con
   for(let dy=-40;dy<=40;dy+=2)for(let dx=-40;dx<=40;dx+=2){const a=ov(box(f,f.x+dx,f.y+dy));const k=a*4+Math.hypot(dx,dy);if(k<best[0]*4+Math.hypot(best[1],best[2]))best=[a,dx,dy]}
   if(best[0]<a0*.5){f.x+=best[1];f.y+=best[2];c++}});if(c){dirty3=true;need2d=true}return c}
 setTimeout(()=>{try{ensureDoors();fitWalls19();save();if(typeof built!=='undefined'&&built)buildStatic()}catch(e){console.error(e)}},1400);
+
+/* ================= v28: 모서리·변 손잡이로 크기 조절 (잠긴 가구도 가능) ================= */
+window.__coarse=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);
 </script>
 </body></html>
