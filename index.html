@@ -5851,7 +5851,7 @@ function planJSONBlob(){return new Blob([planJSONText()],{type:'application/json
 function shotBlob(cb){if(S.mode==='2d'){draw2d();c2.toBlob(cb,'image/png')}else{R.render(scene,cam);c3.toBlob(cb,'image/png')}}
 function renderSet(){if(S.opt.live===undefined)S.opt.live=true;
  $('t_set').innerHTML='<h3>치수선 표시</h3><div class="lbl">치수 단위 (선택)</div><select id="unitsel"><option value="cm">센티미터 (cm)</option><option value="mm">밀리미터 (mm)</option></select><div class="lbl">치수 숫자 크기 <b id="dimfv">'+(S.opt.dimFont||11)+'</b></div><input type="range" id="dimfs" min="8" max="32" value="'+(S.opt.dimFont||11)+'" style="width:100%"><div class="lbl">가구·방 글자 크기 <b id="lblfv">'+(S.opt.lblFont||11)+'</b></div><input type="range" id="lblfs" min="8" max="32" value="'+(S.opt.lblFont||11)+'" style="width:100%">'+togRow('pdim','치수선 전체 켜기/끄기','양 끝에 화살표·눈금이 있는 치수선 (평면·3D·1인칭). 오른쪽 📏 버튼으로도 켜고 끌 수 있어요')+togRow('pg','　└ 방 가로·세로 (초록)','')+togRow('pb','　└ 창문 폭 (파랑)','')+togRow('pr','　└ 건물 바깥 전체 치수 (주황, DWG 기준)','')
- +'<h3>가구</h3>'+togRow('dragAny','고르지 않고 바로 끌기 (예전 방식)','끄면(추천) 탭해서 고른 가구만 끌려서, 화면 이동할 때 가구가 딸려오지 않아요')+togRow('fname','가구 이름 표시','')+togRow('pjoy','화면 이동 조이스틱 (PC)','왼쪽 아래 조이스틱이나 방향키·WASD로 화면을 상하좌우 이동')+togRow('fdim','가구 치수 표시','')+togRow('wdist','벽까지 거리 표시','선택한 가구에서 4방향 벽까지 거리(cm)')+'<div class="lbl">가구 위치 잠금</div><div class="g2"><button id="lkall">🔒 전체 잠그기</button><button id="lkno">🔓 전체 풀기</button></div><p class="mut">가구마다 따로 잠그려면 「선택」 탭의 잠금 버튼이나 가구 목록의 🔒를 누르세요. 가구를 선택했을 때 왼쪽 위 🔓 버튼으로도 됩니다.</p>'+togRow('wall','벽 통과 방지','가구가 벽을 넘어가지 않게 막기')+togRow('snap','5cm 단위 자석(스냅) 이동','')
+ +'<h3>가구</h3>'+togRow('dragAny','고르지 않고 바로 끌기 (예전 방식)','끄면(추천) 탭해서 고른 가구만 끌려서, 화면 이동할 때 가구가 딸려오지 않아요')+togRow('fname','가구 이름 표시','')+togRow('rsnap','크기 조절 시 벽·가구에 자동 맞춤','손잡이를 끌다가 10cm 안으로 가까워지면 딱 붙어요')+togRow('pjoy','화면 이동 조이스틱 (PC)','왼쪽 아래 조이스틱이나 방향키·WASD로 화면을 상하좌우 이동')+togRow('fdim','가구 치수 표시','')+togRow('wdist','벽까지 거리 표시','선택한 가구에서 4방향 벽까지 거리(cm)')+'<div class="lbl">가구 위치 잠금</div><div class="g2"><button id="lkall">🔒 전체 잠그기</button><button id="lkno">🔓 전체 풀기</button></div><p class="mut">가구마다 따로 잠그려면 「선택」 탭의 잠금 버튼이나 가구 목록의 🔒를 누르세요. 가구를 선택했을 때 왼쪽 위 🔓 버튼으로도 됩니다.</p>'+togRow('wall','벽 통과 방지','가구가 벽을 넘어가지 않게 막기')+togRow('snap','5cm 단위 자석(스냅) 이동','')
  +'<h3>화면</h3>'+togRow('names','공간 이름 표시','')+'<div class="lbl">원본 도면 그림 (맞는지 확인용)</div><select id="imgsel"><option value="0">끔</option><option value="5">손글씨 치수 도면 겹쳐 보기</option><option value="6">손글씨 치수 도면 그림만 보기</option><option value="3">스크린샷 도면 겹쳐 보기</option><option value="4">스크린샷 도면 그림만 보기</option><option value="1">DWG 도면 겹쳐 보기</option><option value="2">DWG 도면 그림만 보기</option></select>'+togRow('ceil','1인칭에서 천장 표시','')
  +'<h3>저장</h3><p class="mut">배치와 도면은 이 기기에 자동 저장됩니다. 백업하거나 다른 폰으로 옮기려면 파일로 저장하세요.</p><div class="g2"><button id="sv">배치 파일 저장</button><button id="ld">배치 불러오기</button></div><h3>🟢 실시간 함께 편집</h3><p class="mut">켜 두면 같은 방 이름으로 연 사람끼리 누가 고쳐도 모든 화면에 바로 반영돼요. 끄면 이 폰에서만 고쳐져요.</p>'+togRow('live','실시간 함께 편집','')+'<div class="lbl">방 이름 (같은 이름끼리 함께 편집)</div><div class="g2"><input id="lroom" value="'+(S.opt.room||'home').replace(/"/g,'')+'"><button id="lrok">방 바꾸기</button></div><p class="mut" id="lstat"></p><h3>🔗 함께 만들기 (카톡 링크)</h3><p class="mut">「카톡 링크로 보내기」를 누르면 지금 배치가 링크 하나에 담겨요. 받은 분이 링크를 열어 고치고 같은 방법으로 다시 보내면 돼요. 메모도 함께 갑니다.</p><button id="shl" class="pri" style="width:100%">💬 카톡 링크로 보내기</button><div class="g2" style="margin-top:6px"><button id="opl">🔗 받은 링크 열기</button><button id="bak">↶ 받기 전 배치로</button></div><button id="defl" style="width:100%;margin-top:6px">🏠 기본 배치(형님 배치) 불러오기</button><p class="mut">링크에는 가구·벽지·바닥이 담겨요. 「도면」 탭에서 벽 위치를 직접 고쳤다면 아래 📤 배치 공유하기(파일)로 보내주세요.</p><div class="g2" style="margin-top:6px"><button id="shj">📤 배치 공유하기</button><button id="shi">📤 화면 이미지 공유</button></div><p class="mut">공유하기를 누르면 카카오톡·문자 등으로 바로 보낼 수 있어요. 받은 사람은 「배치 불러오기」로 같은 배치를 열어요. 바로 공유가 안 되는 기기에서는 파일로 저장됩니다.</p><div style="margin-top:6px"><button id="clr" class="danger" style="width:100%">가구 전체 삭제</button></div>'
  +'<h3>정확도 안내</h3><p class="mut">방 크기는 올려주신 DWG 치수(침실1 2,900 · 침실2 2,800 · 안방 3,600 등)에 맞춰 두었지만 벽 위치는 도면을 눈으로 읽은 값이라 몇 cm 차이가 날 수 있어요. 「도면」 탭에서 벽 위치를 직접 고치면 치수선도 같이 바뀝니다.</p>';
@@ -5990,6 +5990,24 @@ window.__coarse=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);
    const sides=[];if(sd[0])sides.push([sd[0],0]);if(sd[1])sides.push([0,sd[1]]);extend(f,sides);return}
   last=sd?{t:now,x:e.clientX,y:e.clientY,id:f.id,sx:sd[0],sy:sd[1]}:null},true);
  window.extendToWall=extend;
+ /* v30: 손잡이로 크기 조절할 때 벽·가구에 자석처럼 맞춤 */
+ function hitFn(f){const obs=S.furn.filter(o=>o!==f&&o.type!=='rug'&&o.type!=='rugr'&&!(elevOf(o)>0)).map(o=>{const e=effDims(o);return{o,t:o.rot*Math.PI/180,hw:e[0]*PXCM/2,hd:e[1]*PXCM/2}});
+  return(x,y)=>isW(x,y)||obs.some(q=>{const dx=x-q.o.x,dy=y-q.o.y,lx=dx*Math.cos(q.t)+dy*Math.sin(q.t),ly=-dx*Math.sin(q.t)+dy*Math.cos(q.t);return Math.abs(lx)<q.hw&&Math.abs(ly)<q.hd})}
+ function gap(f,sx,sy,tol,hit){const th=f.rot*Math.PI/180,c=Math.cos(th),s=Math.sin(th),w=f.w*PXCM,d=f.d*PXCM,ux=sx?sx*c:-sy*s,uy=sx?sx*s:sy*c;let best=null;
+  for(let k=-2;k<=2;k++){const t=k/2.6,lx=sx?sx*w/2:t*w,ly=sx?t*d:sy*d/2,px=f.x+lx*c-ly*s,py=f.y+lx*s+ly*c;let g=null;
+   if(hit(px-ux*.1,py-uy*.1)){for(let b=.25;b<=tol;b+=.25)if(!hit(px-ux*(b+.1),py-uy*(b+.1))){g=-b;break}}
+   else{for(let a=0;a<=tol;a+=.25)if(hit(px+ux*(a+.1),py+uy*(a+.1))){g=a;break}}
+   if(g!==null&&(best===null||g<best))best=g}
+  return best}
+ let snapped=false;
+ c2.addEventListener('pointermove',()=>{if(!rsz||S.mode!=='2d'||S.opt.rsnap===false)return;const f=getF(rsz.id);if(!f)return;const tol=Math.max(10*PXCM,12/V.s),hit=hitFn(f);snapped=false;
+  const th=f.rot*Math.PI/180,c=Math.cos(th),s=Math.sin(th);
+  [[rsz.q[0],0],[0,rsz.q[1]]].forEach(([sx,sy])=>{if(!sx&&!sy)return;const g=gap(f,sx,sy,tol,hit);if(g===null||Math.abs(g)<.3)return;const cm=g/PXCM;
+   if(sx){const nw=Math.max(10,f.w+cm),dl=(nw-f.w)*PXCM/2;f.w=Math.round(nw*10)/10;f.x+=sx*dl*c;f.y+=sx*dl*s}else{const nd=Math.max(5,f.d+cm),dl=(nd-f.d)*PXCM/2;f.d=Math.round(nd*10)/10;f.x+=-sy*dl*s;f.y+=sy*dl*c}snapped=true});
+  if(snapped){need2d=true;dirty3=true}});
+ c2.addEventListener('pointerup',()=>{if(snapped){snapped=false;setTimeout(()=>{const f=selF();if(f){f.w=Math.round(f.w);f.d=Math.round(f.d);save();toast('🧲 벽·가구에 맞췄어요 · '+f.w+' × '+f.d+' cm',1500)}},0)}});
 })();
+
+if(S.opt.rsnap===undefined)S.opt.rsnap=true;
 </script>
 </body></html>
