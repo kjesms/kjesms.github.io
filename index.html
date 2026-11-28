@@ -4718,7 +4718,7 @@ function autoDoors(){const keep=S.furn.filter(f=>f.auto!=='door');const out=[];c
  DOORS.forEach(q=>{if(q[4])add(q,q[4])});
  if(!DOORS.some(q=>q[4]==='침실1')&&ROOMS.find(r=>r.id==='침실1')){const q=[Math.min(cX(1578),cX(1645)),cY(990)-4,Math.max(cX(1578),cX(1645)),cY(990)+4];const sp=spec('침실1');out.push(newF({name:'침실1 문',type:'rdoor',w:88,d:12,h:210,color:sp.color,c2:'#e9e4da',fin:'matte',x:(q[0]+q[2])/2,y:cY(992),rot:cRot(180),lock:true,auto:'door'}))}
  {const hx=cX(1502),hy=cY(744);out.push(newF({name:'현관문 (방화문)',type:'rdoor',w:100,d:16,h:210,color:'#5b6470',c2:'#5b6470',fin:'metal',x:hx,y:hy,rot:cRot(0),lock:true,auto:'door'}))}
- S.opt.doorRev=18;S.furn=keep.concat(out);S.sel=null;save();dirty3=true;need2d=true;if(built)buildStatic();setSel(null);if(S.tab==='auto')renderAuto();toast('🚪 문 '+out.length+'개를 달았어요 — 문을 터치하면 열리고 닫혀요 (🔒 잠금 상태일 때)',3000)}
+ S.opt.doorRev=18;S.furn=keep.concat(out);fixHinges(true);S.sel=null;save();dirty3=true;need2d=true;if(built)buildStatic();setSel(null);if(S.tab==='auto')renderAuto();toast('🚪 문 '+out.length+'개를 달았어요 — 문을 터치하면 열리고 닫혀요 (🔒 잠금 상태일 때)',3000)}
 function autoKitchen(){const keep=S.furn.filter(f=>f.auto!=='kit'&&!(roomAt(f.x,f.y)==='주방/식당'&&!isLocked(f)&&['kitI','kitL','kitLL','sinkisl','island','fridge','ovencab'].includes((TT[f.type]&&TT[f.type].base)||f.type)));
  const P=(x,y)=>[cX(x),cY(y)];const out=[];
  {const[x,y]=P(1008.5,1225);out.push(newF({name:'⑤ ㄱ자 주방 (엔지니어드스톤 상판·사각 씽크볼)',type:'kitLL',w:218,d:206,h:220,color:'#f3f1ec',c2:'#e7e3dc',fin:'matte',f2:'stone',x,y,rot:cRot(180),lock:true,auto:'kit'}))}
@@ -5014,7 +5014,7 @@ function drawTopBase(c,f,w,d,px){
  }
 }
 const TOPX=new Set(["rdoor","aquarium", "armchair", "bathcab", "closetsys", "console", "daybed", "door1", "door3", "doorsw", "floorsofa", "glasscab", "homebar", "kitI", "kitL", "partglass", "partshelf", "partslat", "screen", "sideboard", "sideglass", "sinkc", "sinkisl", "sofaC", "sofaM", "sofaU", "tvwall", "utilsink", "wallshelf"]);
-function drawTop(c,f,w,d,px){const t=TT[f.type];if(t&&t.base){c.save();c.scale(-1,1);drawTop(c,Object.assign({},f,{type:t.base}),w,d,px);c.restore();return}if(TOPX.has(f.type))return drawTopX(c,f,w,d,px);return drawTopBase(c,f,w,d,px)}
+function drawTop(c,f,w,d,px){if(f.type==='rdoor'&&f.hr){c.save();c.scale(-1,1);drawTop(c,Object.assign({},f,{hr:false}),w,d,px);c.restore();return}const t=TT[f.type];if(t&&t.base){c.save();c.scale(-1,1);drawTop(c,Object.assign({},f,{type:t.base}),w,d,px);c.restore();return}if(TOPX.has(f.type))return drawTopX(c,f,w,d,px);return drawTopBase(c,f,w,d,px)}
 function drawTopX(c,f,w,d,px){
  const col=f.color||'#c9a77c',c2=sec(f),fin=finOf(f),cm=w/(f.w||1);const L=-w/2,T=-d/2;const ln=shade(col,-.45);
  const R_=(x,y,ww,hh,r,fill,stroke,lw)=>{rrp(c,x,y,ww,hh,r);if(fill){c.fillStyle=fill;c.fill()}if(stroke){c.strokeStyle=stroke;c.lineWidth=(lw||1)*px;c.stroke()}};
@@ -5316,7 +5316,7 @@ function mkBase(f){
  return g}
 const MKX=new Set(["rdoor","aquarium", "armchair", "bathcab", "closetsys", "console", "daybed", "door1", "door3", "doorsw", "floorsofa", "glasscab", "homebar", "kitI", "kitL", "partglass", "partshelf", "partslat", "screen", "sideboard", "sideglass", "sinkc", "sinkisl", "sofaC", "sofaM", "sofaU", "tvwall", "utilsink", "wallshelf"]);
 let TG=null;
-function mk(f){const t=TT[f.type];if(t&&t.base){const g=new THREE.Group();const inner=mk(Object.assign({},f,{type:t.base}));inner.scale.x=-1;g.add(inner);return g}if(MKX.has(f.type))return mkX(f);return mkBase(f)}
+function mk(f){if(f.type==='rdoor'&&f.hr){const g=new THREE.Group();const inner=mk(Object.assign({},f,{hr:false}));inner.scale.x=-1;g.add(inner);return g}const t=TT[f.type];if(t&&t.base){const g=new THREE.Group();const inner=mk(Object.assign({},f,{type:t.base}));inner.scale.x=-1;g.add(inner);return g}if(MKX.has(f.type))return mkX(f);return mkBase(f)}
 function mkX(f){
  const g=new THREE.Group();const w=Math.max(.02,f.w/100),d=Math.max(.01,f.d/100),h=Math.max(.005,f.h/100);const Z=M0();
  const A=MT(f.color,finOf(f)),C2=sec(f),A2=MT(C2,fin2Of(f));const A3=MT(darken(f.color,.12),finOf(f));
@@ -5618,7 +5618,7 @@ function toggleLock(){const f=selF();if(!f)return;f.lock=!f.lock;save();need2d=t
 function updLockBtn(){const f=selF();const q=$('qlock');q.textContent=f&&isLocked(f)?'🔒':'🔓';q.classList.toggle('on',!!(f&&isLocked(f)))}
 function updGlobalLock(){const z=$('zlock');const all=S.furn.length>0&&S.furn.every(f=>f.lock);z.textContent=all?'🔒':'🔓';z.classList.toggle('on',all)}
 function setAllLock(v){if(!S.furn.length){toast('배치한 가구가 없어요');return}S.furn.forEach(f=>f.lock=v);save();need2d=true;renderSel();updLockBtn();updGlobalLock();toast(v?'🔒 모든 가구를 잠갔어요':'🔓 모든 가구 잠금을 풀었어요')}
-function setSel(id){S.sel=id;const f=selF();$('selbar').style.display=f?'flex':'none';$('qmir').style.display=f&&MIRP[f.type]?'':'none';if(f)$('selname').textContent=f.name;need2d=true;updSelHelper();renderSel();updLockBtn()}
+function setSel(id){S.sel=id;const f=selF();$('selbar').style.display=f?'flex':'none';$('qmir').style.display=f&&(MIRP[f.type]||f.type==='rdoor')?'':'none';if(f)$('selname').textContent=f.name;need2d=true;updSelHelper();renderSel();updLockBtn()}
 function newF(o){return Object.assign({id:S.nid++,name:'가구',w:100,d:60,h:75,type:'box',color:'#c9a77c',c2:'',fin:'',fin2:'',el:0,x:0,y:0,rot:0,rx:0,rz:0,tex:null,lock:false},o)}
 function roomAt(x,y){for(const r of ROOMS)for(const q of r.r)if(inRect(x,y,q))return r.id;return null}
 function addFurn(o){let c=roomCenter(S.room);
@@ -5683,7 +5683,7 @@ function renderSel(){
  const t=TT[f.type]||{n:'3D 모델',ic:'📦'},curM=f.color+'|'+finOf(f),cur2=sec(f)+'|'+fin2Of(f);const ax=S.axis==='z'?'z':'x',key=ax==='x'?'rx':'rz',cur=Math.round(f[key]||0);
  const elv=f.el==='top'?'top':Math.round(+f.el||0);
  el.innerHTML='<div class="selhead"><span class="ic">'+t.ic+'</span><input type="text" id="sn" value="'+f.name.replace(/"/g,'&quot;')+'"><small class="mut">'+t.n+' · '+(roomAt(f.x,f.y)||'바깥')+'</small></div>'
- +'<div class="acts"><button data-a="rl">↺ 90°</button><button data-a="rr">↻ 90°</button><button data-a="wall">🧲 벽에 붙이기</button><button data-a="dup">⧉ 복제</button>'+(MIRP[f.type]?'<button data-a="mir">⇋ 좌우 방향</button>':'')+'<button data-a="lock" class="'+(f.lock?'on':'')+'">'+(f.lock?'🔒 잠김':'🔓 잠금')+'</button><button data-a="del" class="danger">🗑 삭제</button></div>'
+ +'<div class="acts"><button data-a="rl">↺ 90°</button><button data-a="rr">↻ 90°</button><button data-a="wall">🧲 벽에 붙이기</button><button data-a="dup">⧉ 복제</button>'+(MIRP[f.type]?'<button data-a="mir">⇋ 좌우 방향</button>':f.type==='rdoor'?'<button data-a="mir">⇋ 경첩 방향</button>':'')+'<button data-a="lock" class="'+(f.lock?'on':'')+'">'+(f.lock?'🔒 잠김':'🔓 잠금')+'</button><button data-a="del" class="danger">🗑 삭제</button></div>'
  +'<h3>크기 (cm)</h3><div class="g3">'+stepper('sw','가로',f.w,5)+stepper('sd','깊이',f.d,5)+stepper('sh','높이',f.h,5)+'</div>'
  +'<div class="g2" style="margin-top:6px">'+(elv==='top'?'<div><div class="lbl">설치 높이</div><button id="sel0" style="width:100%">천장에 붙음 (바닥으로)</button></div>':stepper('sel','바닥에서 띄우기',elv,5))+'<div><div class="lbl">각도 (좌우 회전)</div><div class="stp"><button data-rot="-15">−15</button><input type="number" id="srot" value="'+Math.round(f.rot)+'" inputmode="decimal"><button data-rot="15">+15</button></div></div></div>'
  +kitHtml(f)+'<h3>재질 · 색상</h3>'+swatches('mt',MATS,curM)
@@ -5757,7 +5757,7 @@ function renderRoom(){
  $('t_room').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>goRoom(b.dataset.r));
  $('rv2').onclick=()=>{setMode('2d');goRoom(S.room)};$('rv3').onclick=()=>{setMode('3d');goRoom(S.room)};$('rvw').onclick=()=>{setMode('walk');goRoom(S.room)};
  bindDeco()}
-function mirSel(){const f=selF();if(!f||!MIRP[f.type])return;f.type=MIRP[f.type];const sw={'오른쪽':'왼쪽','왼쪽':'오른쪽'};f.name=f.name.replace(/오른쪽|왼쪽/g,m=>sw[m]);save();dirty3=true;need2d=true;setSel(f.id);toast('⇋ 방향을 바꿨어요 — '+TT[f.type].n,1600)}
+function mirSel(){const f=selF();if(f&&f.type==='rdoor'){f.hr=!f.hr;f.hrv=1;save();dirty3=true;need2d=true;if(built)buildStatic();setSel(f.id);toast('⇋ 문 경첩 방향을 바꿨어요',1400);return}if(!f||!MIRP[f.type])return;f.type=MIRP[f.type];const sw={'오른쪽':'왼쪽','왼쪽':'오른쪽'};f.name=f.name.replace(/오른쪽|왼쪽/g,m=>sw[m]);save();dirty3=true;need2d=true;setSel(f.id);toast('⇋ 방향을 바꿨어요 — '+TT[f.type].n,1600)}
 function readImg(file,cb){const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const m=480,k=Math.min(1,m/Math.max(im.width,im.height));const cv=document.createElement('canvas');cv.width=Math.round(im.width*k);cv.height=Math.round(im.height*k);cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);cb(cv.toDataURL('image/jpeg',.82))};im.src=fr.result};fr.readAsDataURL(file)}
 $('fGlb').onchange=e=>{const fl=e.target.files[0];e.target.value='';if(!fl)return;init3();const url=URL.createObjectURL(fl);
  new THREE.GLTFLoader().load(url,g=>{const model=g.scene;const box=new THREE.Box3().setFromObject(model);const size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());
@@ -5851,7 +5851,7 @@ function planJSONBlob(){return new Blob([planJSONText()],{type:'application/json
 function shotBlob(cb){if(S.mode==='2d'){draw2d();c2.toBlob(cb,'image/png')}else{R.render(scene,cam);c3.toBlob(cb,'image/png')}}
 function renderSet(){if(S.opt.live===undefined)S.opt.live=true;
  $('t_set').innerHTML='<h3>치수선 표시</h3><div class="lbl">치수 단위 (선택)</div><select id="unitsel"><option value="cm">센티미터 (cm)</option><option value="mm">밀리미터 (mm)</option></select><div class="lbl">치수 숫자 크기 <b id="dimfv">'+(S.opt.dimFont||11)+'</b></div><input type="range" id="dimfs" min="8" max="32" value="'+(S.opt.dimFont||11)+'" style="width:100%"><div class="lbl">가구·방 글자 크기 <b id="lblfv">'+(S.opt.lblFont||11)+'</b></div><input type="range" id="lblfs" min="8" max="32" value="'+(S.opt.lblFont||11)+'" style="width:100%">'+togRow('pdim','치수선 전체 켜기/끄기','양 끝에 화살표·눈금이 있는 치수선 (평면·3D·1인칭). 오른쪽 📏 버튼으로도 켜고 끌 수 있어요')+togRow('pg','　└ 방 가로·세로 (초록)','')+togRow('pb','　└ 창문 폭 (파랑)','')+togRow('pr','　└ 건물 바깥 전체 치수 (주황, DWG 기준)','')
- +'<h3>가구</h3>'+togRow('dragAny','고르지 않고 바로 끌기 (예전 방식)','끄면(추천) 탭해서 고른 가구만 끌려서, 화면 이동할 때 가구가 딸려오지 않아요')+togRow('fname','가구 이름 표시','')+togRow('fdim','가구 치수 표시','')+togRow('wdist','벽까지 거리 표시','선택한 가구에서 4방향 벽까지 거리(cm)')+'<div class="lbl">가구 위치 잠금</div><div class="g2"><button id="lkall">🔒 전체 잠그기</button><button id="lkno">🔓 전체 풀기</button></div><p class="mut">가구마다 따로 잠그려면 「선택」 탭의 잠금 버튼이나 가구 목록의 🔒를 누르세요. 가구를 선택했을 때 왼쪽 위 🔓 버튼으로도 됩니다.</p>'+togRow('wall','벽 통과 방지','가구가 벽을 넘어가지 않게 막기')+togRow('snap','5cm 단위 자석(스냅) 이동','')
+ +'<h3>가구</h3>'+togRow('dragAny','고르지 않고 바로 끌기 (예전 방식)','끄면(추천) 탭해서 고른 가구만 끌려서, 화면 이동할 때 가구가 딸려오지 않아요')+togRow('fname','가구 이름 표시','')+togRow('pjoy','화면 이동 조이스틱 (PC)','왼쪽 아래 조이스틱이나 방향키·WASD로 화면을 상하좌우 이동')+togRow('fdim','가구 치수 표시','')+togRow('wdist','벽까지 거리 표시','선택한 가구에서 4방향 벽까지 거리(cm)')+'<div class="lbl">가구 위치 잠금</div><div class="g2"><button id="lkall">🔒 전체 잠그기</button><button id="lkno">🔓 전체 풀기</button></div><p class="mut">가구마다 따로 잠그려면 「선택」 탭의 잠금 버튼이나 가구 목록의 🔒를 누르세요. 가구를 선택했을 때 왼쪽 위 🔓 버튼으로도 됩니다.</p>'+togRow('wall','벽 통과 방지','가구가 벽을 넘어가지 않게 막기')+togRow('snap','5cm 단위 자석(스냅) 이동','')
  +'<h3>화면</h3>'+togRow('names','공간 이름 표시','')+'<div class="lbl">원본 도면 그림 (맞는지 확인용)</div><select id="imgsel"><option value="0">끔</option><option value="5">손글씨 치수 도면 겹쳐 보기</option><option value="6">손글씨 치수 도면 그림만 보기</option><option value="3">스크린샷 도면 겹쳐 보기</option><option value="4">스크린샷 도면 그림만 보기</option><option value="1">DWG 도면 겹쳐 보기</option><option value="2">DWG 도면 그림만 보기</option></select>'+togRow('ceil','1인칭에서 천장 표시','')
  +'<h3>저장</h3><p class="mut">배치와 도면은 이 기기에 자동 저장됩니다. 백업하거나 다른 폰으로 옮기려면 파일로 저장하세요.</p><div class="g2"><button id="sv">배치 파일 저장</button><button id="ld">배치 불러오기</button></div><h3>🟢 실시간 함께 편집</h3><p class="mut">켜 두면 같은 방 이름으로 연 사람끼리 누가 고쳐도 모든 화면에 바로 반영돼요. 끄면 이 폰에서만 고쳐져요.</p>'+togRow('live','실시간 함께 편집','')+'<div class="lbl">방 이름 (같은 이름끼리 함께 편집)</div><div class="g2"><input id="lroom" value="'+(S.opt.room||'home').replace(/"/g,'')+'"><button id="lrok">방 바꾸기</button></div><p class="mut" id="lstat"></p><h3>🔗 함께 만들기 (카톡 링크)</h3><p class="mut">「카톡 링크로 보내기」를 누르면 지금 배치가 링크 하나에 담겨요. 받은 분이 링크를 열어 고치고 같은 방법으로 다시 보내면 돼요. 메모도 함께 갑니다.</p><button id="shl" class="pri" style="width:100%">💬 카톡 링크로 보내기</button><div class="g2" style="margin-top:6px"><button id="opl">🔗 받은 링크 열기</button><button id="bak">↶ 받기 전 배치로</button></div><button id="defl" style="width:100%;margin-top:6px">🏠 기본 배치(형님 배치) 불러오기</button><p class="mut">링크에는 가구·벽지·바닥이 담겨요. 「도면」 탭에서 벽 위치를 직접 고쳤다면 아래 📤 배치 공유하기(파일)로 보내주세요.</p><div class="g2" style="margin-top:6px"><button id="shj">📤 배치 공유하기</button><button id="shi">📤 화면 이미지 공유</button></div><p class="mut">공유하기를 누르면 카카오톡·문자 등으로 바로 보낼 수 있어요. 받은 사람은 「배치 불러오기」로 같은 배치를 열어요. 바로 공유가 안 되는 기기에서는 파일로 저장됩니다.</p><div style="margin-top:6px"><button id="clr" class="danger" style="width:100%">가구 전체 삭제</button></div>'
  +'<h3>정확도 안내</h3><p class="mut">방 크기는 올려주신 DWG 치수(침실1 2,900 · 침실2 2,800 · 안방 3,600 등)에 맞춰 두었지만 벽 위치는 도면을 눈으로 읽은 값이라 몇 cm 차이가 날 수 있어요. 「도면」 탭에서 벽 위치를 직접 고치면 치수선도 같이 바뀝니다.</p>';
@@ -5865,7 +5865,7 @@ function renderSet(){if(S.opt.live===undefined)S.opt.live=true;
  $('clr').onclick=()=>{if(confirm('배치한 가구를 모두 삭제할까요?')){S.furn=[];setSel(null);save();dirty3=true;need2d=true}}}
 $('fJson').onchange=async e=>{const fl=e.target.files[0];e.target.value='';if(!fl)return;try{const d=JSON.parse(await fl.text());applyShared(d,'배치를 불러왔어요')}catch(er){toast('파일을 읽지 못했어요')}};
 function applyShared(d,msg){const Q=msg===false,ks=S.sel;if(!Q)try{localStorage.setItem('b84_bak',JSON.stringify(JSON.parse(planJSONText())))}catch(e){}if(d.plan&&d.plan.ver){VER=d.plan.ver;PICK=d.plan.pick||{};PMODE=d.plan.mode||'new';PMIR=!!d.plan.mir;PVF=!!d.plan.vf;WALLT=d.plan.wallT||20;if(!VER.ann){VER.ann=mkAnn(PMIR,PVF)}if(!VER.img)VER.img=mkImg(!PMIR);compose();savePlanData();commitPlan()}else if(d.plan){PICK=d.plan.pick||PICK;PMODE=d.plan.mode||PMODE;if(d.plan.wallT)WALLT=d.plan.wallT;if(!!d.plan.mir!==PMIR)mirrorPlan();if(!!d.plan.vf!==PVF)mirrorPlanV();compose();savePlanData();commitPlan()}
- if(d.opt&&d.opt.unit)S.opt.unit=d.opt.unit;S.furn=(d.furn||[]).map(f=>Object.assign({rx:0,rz:0,c2:'',fin:'',fin2:'',el:0,rot:0,tex:null,lock:false},f));S.nid=d.nid||(Math.max(0,...S.furn.map(f=>f.id))+1);setSel(Q&&S.furn.some(f=>f.id===ks)?ks:null);if(d.deco)S.opt.deco=d.deco;save();dirty3=true;need2d=true;renderPlan();if(!Q)fitView(viewBounds());if(built)buildStatic();if(!Q)toast(msg||'배치를 불러왔어요',3000)}
+ if(d.opt&&d.opt.unit)S.opt.unit=d.opt.unit;S.furn=(d.furn||[]).map(f=>Object.assign({rx:0,rz:0,c2:'',fin:'',fin2:'',el:0,rot:0,tex:null,lock:false},f));S.nid=d.nid||(Math.max(0,...S.furn.map(f=>f.id))+1);fixHinges(true);setSel(Q&&S.furn.some(f=>f.id===ks)?ks:null);if(d.deco)S.opt.deco=d.deco;save();dirty3=true;need2d=true;renderPlan();if(!Q)fitView(viewBounds());if(built)buildStatic();if(!Q)toast(msg||'배치를 불러왔어요',3000)}
 /* ================= 버튼 연결 ================= */
 document.querySelectorAll('#modes button').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
 document.querySelectorAll('#tabs button[data-t]').forEach(b=>b.onclick=()=>{showTab(b.dataset.t);if(b.dataset.t==='plan')renderPlan()});
@@ -5914,5 +5914,37 @@ addEventListener('pointerdown',()=>{LIVE.down=true},true);
 (function(){const h=document.querySelector('header');if(h&&!document.getElementById('livedot')){const b=document.createElement('button');b.id='livedot';b.className='sm';b.textContent='⚪';b.onclick=()=>{showTab('set');setTimeout(()=>{const e=document.getElementById('lstat');if(e)e.scrollIntoView({block:'center'})},60)};h.appendChild(b)}})();
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&S.opt.live!==false&&!LIVE.ok)liveStart()});
 setTimeout(()=>liveStart(),1100);
+
+/* ================= v26: 문 경첩 방향 (공식 84B 도면 기준) ================= */
+const HINGE_T={'침실1 문':'침실2','침실2 문':'팬트리','다용도실 문':'주방/식당','욕실1 문':'안방','욕실2 문':'현관','안방 문':'욕실2','대피공간 방화문':'안방'};
+function roomCtr(id){const r=ROOMS.find(q=>q.id===id);if(!r||!r.r||!r.r.length)return null;const q=r.r[0];return[(q[0]+q[2])/2,(q[1]+q[3])/2]}
+function fixHinges(quiet,force){let c=0;S.furn.forEach(f=>{if(f.type!=='rdoor'||f.auto!=='door')return;if(f.hrv&&!force)return;const t=HINGE_T[f.name];if(!t){f.hrv=1;return}const p=roomCtr(t);if(!p)return;
+  const a=f.rot*Math.PI/180,ux=Math.cos(a),uy=Math.sin(a),hw=f.w*PXCM/2;const dL=Math.hypot(f.x-ux*hw-p[0],f.y-uy*hw-p[1]),dR=Math.hypot(f.x+ux*hw-p[0],f.y+uy*hw-p[1]);
+  const hr=dR<dL;if(!!f.hr!==hr)c++;f.hr=hr;f.hrv=1});if(c){dirty3=true;need2d=true}return c}
+setTimeout(()=>{try{if(fixHinges(true)){save();if(built)buildStatic()}}catch(e){}},1300);
+
+/* ================= v26: 화면 이동 조이스틱 (2D·3D) + 방향키 ================= */
+(function(){
+ const st=document.createElement('style');st.textContent='#pjoy{position:absolute;left:14px;bottom:62px;width:112px;height:112px;border-radius:50%;background:#0f172a40;border:2px solid #0f172a70;touch-action:none;z-index:6;display:none;cursor:grab}#pjoy.on{display:block}#pknob{position:absolute;left:33px;top:33px;width:46px;height:46px;border-radius:50%;background:#0ea5e9d8;pointer-events:none;box-shadow:0 2px 6px #0004}#pjoy small{position:absolute;left:0;right:0;top:-18px;text-align:center;font-size:11px;color:#334155;pointer-events:none}';document.head.appendChild(st);
+ const j=document.createElement('div');j.id='pjoy';j.title='끌어서 화면 이동 (방향키·WASD도 돼요)';j.innerHTML='<small>화면 이동</small><div id="pknob"></div>';stage.appendChild(j);const kn=j.querySelector('#pknob');
+ const PJ={x:0,y:0,on:false,id:null};
+ const setK=(x,y)=>{kn.style.transform='translate('+x*33+'px,'+y*33+'px)'};
+ const mv=e=>{const r=j.getBoundingClientRect();let x=(e.clientX-r.left-r.width/2)/(r.width/2),y=(e.clientY-r.top-r.height/2)/(r.height/2);const m=Math.hypot(x,y);if(m>1){x/=m;y/=m}PJ.x=x;PJ.y=y;setK(x,y)};
+ j.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();PJ.on=true;PJ.id=e.pointerId;try{j.setPointerCapture(e.pointerId)}catch(_){}mv(e)});
+ j.addEventListener('pointermove',e=>{if(PJ.on&&e.pointerId===PJ.id){e.preventDefault();e.stopPropagation();mv(e)}});
+ const up=e=>{if(e.pointerId!==PJ.id)return;PJ.on=false;PJ.x=PJ.y=0;setK(0,0)};j.addEventListener('pointerup',up);j.addEventListener('pointercancel',up);
+ ['wheel','click','dblclick'].forEach(k=>j.addEventListener(k,e=>e.stopPropagation()));
+ if(S.opt.pjoy===undefined)S.opt.pjoy=!!(window.matchMedia&&matchMedia('(pointer:fine)').matches);
+ window.pjoyShow=()=>{j.classList.toggle('on',S.opt.pjoy!==false&&S.opt.pjoy&&S.mode!=='walk')};
+ let lt=performance.now();
+ setInterval(()=>{const now=performance.now(),dt=Math.min(.05,(now-lt)/1000);lt=now;pjoyShow();if(S.mode==='walk')return;
+  const ae=document.activeElement,tg=ae&&ae.tagName,typing=tg==='INPUT'||tg==='SELECT'||tg==='TEXTAREA';
+  let x=PJ.x,y=PJ.y;
+  if(!typing&&S.sel==null&&!(K.control||K.meta)){x+=((K.arrowright||K.d)?1:0)-((K.arrowleft||K.a)?1:0);y+=((K.arrowdown||K.s)?1:0)-((K.arrowup||K.w)?1:0)}
+  if(!x&&!y)return;const m=Math.hypot(x,y);if(m>1){x/=m;y/=m}const sp=Math.pow(m>1?1:m,1.3);
+  if(S.mode==='2d'){const v=Math.min(cw,ch)*.9*dt;V.tx-=x*v*(sp/Math.max(.01,m>1?1:m));V.ty-=y*v*(sp/Math.max(.01,m>1?1:m));need2d=true}
+  else if(S.mode==='3d'){const v=170*dt;pan3(-x*v,-y*v)}},16);
+ addEventListener('keydown',e=>{const tg=e.target.tagName;if(tg==='INPUT'||tg==='SELECT'||tg==='TEXTAREA')return;if(S.mode!=='walk'&&S.sel==null&&e.key.startsWith('Arrow'))e.preventDefault()},true);
+})();
 </script>
 </body></html>
