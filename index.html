@@ -5939,15 +5939,15 @@ setTimeout(()=>{try{if(fixHinges(true)){save();if(built)buildStatic()}}catch(e){
  let lt=performance.now();
  setInterval(()=>{const now=performance.now(),dt=Math.min(.05,(now-lt)/1000);lt=now;pjoyShow();if(S.mode==='walk')return;
   const ae=document.activeElement,tg=ae&&ae.tagName,typing=tg==='INPUT'||tg==='SELECT'||tg==='TEXTAREA';
-  let x=PJ.x,y=PJ.y;
+  let x=-PJ.x,y=-PJ.y;/* v33: 조이스틱은 도면이 미는 방향으로 따라 움직이게 */
   if(!typing&&S.sel==null&&!(K.control||K.meta)){x+=((K.arrowright||K.d)?1:0)-((K.arrowleft||K.a)?1:0);y+=((K.arrowdown||K.s)?1:0)-((K.arrowup||K.w)?1:0)}
-  if(PJ.on&&S.sel!=null){const f=selF();if(f&&!isLocked(f)){if(!x&&!y)return;const m=Math.min(1,Math.hypot(x,y)),k=Math.pow(m,1.6)/Math.max(.001,m),v=110*PXCM*dt;let dx,dy;
+  if(PJ.on&&S.sel!=null){const f=selF();if(f&&!isLocked(f)){const x=PJ.x,y=PJ.y;if(!x&&!y)return;const m=Math.min(1,Math.hypot(x,y)),k=Math.pow(m,1.6)/Math.max(.001,m),v=110*PXCM*dt;let dx,dy;
     if(S.mode==='3d'){const rx=Math.cos(O.y),rz=-Math.sin(O.y),fx=-Math.sin(O.y),fz=-Math.cos(O.y);dx=(rx*x-fx*y)*v*k;dy=(rz*x-fz*y)*v*k}else{dx=x*v*k;dy=y*v*k}
     if(tryMove(f,f.x+dx,f.y+dy)){if(window.__snapMove&&S.opt.rsnap!==false&&m<.35)window.__snapMove(f);if(S.mode==='3d')syncGroup(f);need2d=true;PJ.moved=true}return}
    else if(f&&!PJ.warn){PJ.warn=true;toast('🔒 잠긴 가구예요 — 🔓 풀면 조이스틱으로 옮길 수 있어요 (지금은 화면이 움직여요)',2200)}}
   if(!x&&!y)return;const m=Math.hypot(x,y);if(m>1){x/=m;y/=m}const sp=Math.pow(m>1?1:m,1.3);
   if(S.mode==='2d'){const v=Math.min(cw,ch)*.9*dt;V.tx-=x*v*(sp/Math.max(.01,m>1?1:m));V.ty-=y*v*(sp/Math.max(.01,m>1?1:m));need2d=true}
-  else if(S.mode==='3d'){const v=170*dt;pan3(-x*v,-y*v)}},16);
+  else if(S.mode==='3d'){const v=170*dt;pan3(-x*v,y*v)}},16);
  addEventListener('keydown',e=>{const tg=e.target.tagName;if(tg==='INPUT'||tg==='SELECT'||tg==='TEXTAREA')return;if(S.mode!=='walk'&&S.sel==null&&e.key.startsWith('Arrow'))e.preventDefault()},true);
 })();
 
