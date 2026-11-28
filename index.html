@@ -5963,5 +5963,33 @@ setTimeout(()=>{try{ensureDoors();fitWalls19();save();if(typeof built!=='undefin
 
 /* ================= v28: 모서리·변 손잡이로 크기 조절 (잠긴 가구도 가능) ================= */
 window.__coarse=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);
+
+/* ================= v29: 옆면 두 번 탭 → 그쪽 벽까지 자동 늘리기 ================= */
+(function(){
+ const isW=(x,y)=>{const ix=Math.floor(x/CELL),iy=Math.floor(y/CELL);if(ix<0||iy<0||ix>=GW||iy>=GH)return true;const i=iy*GW+ix;return !!(wallM[i]||winM[i])};
+ function sideAt(f,wx,wy){const th=f.rot*Math.PI/180,dx=wx-f.x,dy=wy-f.y,lx=dx*Math.cos(th)+dy*Math.sin(th),ly=-dx*Math.sin(th)+dy*Math.cos(th),w=f.w*PXCM,d=f.d*PXCM,tol=(window.__coarse?24:14)/V.s;
+  if(Math.abs(lx)>w/2+tol||Math.abs(ly)>d/2+tol)return null;const sx=Math.abs(Math.abs(lx)-w/2)<tol?Math.sign(lx):0,sy=Math.abs(Math.abs(ly)-d/2)<tol?Math.sign(ly):0;return(sx||sy)?[sx,sy]:null}
+ function reach(f,sx,sy){const th=f.rot*Math.PI/180,c=Math.cos(th),s=Math.sin(th),w=f.w*PXCM,d=f.d*PXCM;
+  const ux=sx?sx*c:-sy*s,uy=sx?sx*s:sy*c;let best=1e9;
+  const obs=S.furn.filter(o=>o!==f&&o.type!=='rug'&&o.type!=='rugr'&&!(elevOf(o)>0)).map(o=>{const e=effDims(o);return{o,t:o.rot*Math.PI/180,hw:e[0]*PXCM/2,hd:e[1]*PXCM/2}});
+  const inF=(x,y)=>obs.some(q=>{const dx=x-q.o.x,dy=y-q.o.y,lx=dx*Math.cos(q.t)+dy*Math.sin(q.t),ly=-dx*Math.sin(q.t)+dy*Math.cos(q.t);return Math.abs(lx)<q.hw&&Math.abs(ly)<q.hd});
+  const hit=(x,y)=>isW(x,y)||inF(x,y);
+  for(let k=-2;k<=2;k++){const t=k/2.6;const lx=sx?sx*w/2:t*w,ly=sx?t*d:sy*d/2;let px=f.x+lx*c-ly*s,py=f.y+lx*s+ly*c;let dist=0;
+   if(hit(px+ux*1.5,py+uy*1.5)){best=Math.min(best,0);continue}
+   while(dist<700&&!hit(px+ux*(dist+1),py+uy*(dist+1)))dist+=1;best=Math.min(best,dist)}
+  return best>=700?null:best}
+ function extend(f,sides){let msg=[];const th=f.rot*Math.PI/180,c=Math.cos(th),s=Math.sin(th);
+  sides.forEach(([sx,sy])=>{const r=reach(f,sx,sy);if(r==null||r<1){msg.push(r==null?'벽이 너무 멀어요':'이미 닿아 있어요');return}const cm=Math.round(r/PXCM);if(cm<1)return;
+   if(sx){f.w+=cm;const sh=sx*cm*PXCM/2;f.x+=sh*c;f.y+=sh*s}else{f.d+=cm;const sh=sy*cm*PXCM/2;f.x+=-sh*s;f.y+=sh*c}msg.push('+'+cm+'cm')});
+  save();dirty3=true;need2d=true;if(typeof built!=='undefined'&&built)buildStatic();renderSel();toast('↔ 벽·가구까지 늘렸어요 · '+Math.round(f.w)+' × '+Math.round(f.d)+' cm'+(msg.length?' ('+msg.join(', ')+')':''),1800)}
+ let last=null;
+ c2.addEventListener('pointerdown',e=>{if(S.mode!=='2d')return;const f=selF();if(!f||f.auto==='door'||f.rx||f.rz){last=null;return}
+  const r=stage.getBoundingClientRect(),[wx,wy]=s2w(e.clientX-r.left,e.clientY-r.top);const sd=sideAt(f,wx,wy);const now=Date.now();
+  if(sd&&last&&now-last.t<420&&Math.hypot(e.clientX-last.x,e.clientY-last.y)<30&&last.id===f.id&&last.sx===sd[0]&&last.sy===sd[1]){
+   e.stopImmediatePropagation();e.preventDefault();last=null;rsz=null;drag=null;
+   const sides=[];if(sd[0])sides.push([sd[0],0]);if(sd[1])sides.push([0,sd[1]]);extend(f,sides);return}
+  last=sd?{t:now,x:e.clientX,y:e.clientY,id:f.id,sx:sd[0],sy:sd[1]}:null},true);
+ window.extendToWall=extend;
+})();
 </script>
 </body></html>
